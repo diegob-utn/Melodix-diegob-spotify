@@ -1,17 +1,29 @@
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 namespace Melodix.Models
 {
-    // Música, álbumes, artistas, listas y pistas
+    /// <summary>
+    /// Representa un artista musical.
+    /// </summary>
     public class Artista
     {
-        // Necesarios
+        [Key]
         public int Id { get; set; }
+
+        [Required]
+        [MaxLength(150)]
         public string Nombre { get; set; }
+
+        [MaxLength(100)]
         public string SpotifyArtistaId { get; set; }
+
+        [MaxLength(512)]
         public string UrlImagen { get; set; }
 
-        // Navegadores
-        public List<Pista> Pistas { get; set; } = new();
-        public List<Album> Albumes { get; set; } = new();
-        public List<UsuarioSigueArtista> UsuariosQueSiguen { get; set; } = new();
+        // Navegación
+        public virtual List<Pista> Pistas { get; set; } = new();
+        public virtual List<Album> Albumes { get; set; } = new();
+        public virtual List<UsuarioSigueArtista> UsuariosQueSiguen { get; set; } = new();
     }
 }

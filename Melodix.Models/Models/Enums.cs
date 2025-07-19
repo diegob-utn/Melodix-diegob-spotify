@@ -57,4 +57,10 @@ namespace Melodix.Models
                 Rechazada = 2
         }
 
+
+        public enum GeneroUsuario
+        {
+                Hombre = 0,
+                Mujer = 1
+        }
 }

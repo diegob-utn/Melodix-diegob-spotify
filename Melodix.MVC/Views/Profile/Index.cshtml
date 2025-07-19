@@ -1,0 +1,16 @@
+﻿@model Melodix.Models.Models.ApplicationUser
+
+<h2>Perfil de @Model.UserName</h2>
+
+@if(string.IsNullOrEmpty(Model.SpotifyAccessToken))
+{
+    <a href="@Url.Action("ConnectSpotify", "Profile")" class="btn btn-primary">Conectar cuenta Premium de Spotify</a>
+}
+else
+{
+    <div class="alert alert-success">
+        ¡Cuenta de Spotify conectada!
+    </div>
+    <p>Access Token: @Model.SpotifyAccessToken</p>
+    <!-- Aquí puedes poner botón para desconectar, llamar a APIs, etc. -->
+}

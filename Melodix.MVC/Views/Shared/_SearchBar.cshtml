@@ -1,0 +1,56 @@
+﻿<form id="spotify-search-form" class="d-flex" role="search" autocomplete="off">
+    <input class="form-control me-2" type="search" id="spotify-search-input" placeholder="Buscar música, artista, álbum..." aria-label="Buscar">
+    <button class="btn btn-outline-success" type="submit">Buscar</button>
+</form>
+<div id="spotify-search-results"></div>
+
+<script>
+    const token = '@Model.SpotifyAccessToken'; // o pásalo como variable global
+    let deviceId = null;
+    // Inicializa el SDK y obtén deviceId
+    window.onSpotifyWebPlaybackSDKReady = () => {
+        const player = new Spotify.Player({
+            name: 'Melodix-diegob-spotify',
+            getOAuthToken: cb => { cb(token); },
+            volume: 0.5
+        });
+        player.addListener('ready', ({ device_id }) => {
+            deviceId = device_id;
+        });
+        player.connect();
+    };
+
+    document.getElementById('spotify-search-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        let q = document.getElementById('spotify-search-input').value;
+        fetch(`/Spotify/Search?q=${encodeURIComponent(q)}`)
+            .then(r => r.json())
+            .then(results => {
+                let html = '';
+                (results?.tracks?.items || []).forEach(track => {
+                    html += `<div>
+                        <img src="${track.album.images[2]?.url || ''}" style="width:40px">
+                        <span>${track.name} - ${track.artists.map(a=>a.name).join(', ')}</span>
+                        <button onclick="playTrack('${track.uri}')">▶️</button>
+                    </div>`;
+                });
+                document.getElementById('spotify-search-results').innerHTML = html;
+            });
+    });
+
+    function playTrack(trackUri) {
+        if (!deviceId) {
+            alert('El reproductor aún no está listo.');
+            return;
+        }
+        fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+            method: 'PUT',
+            body: JSON.stringify({ uris: [trackUri] }),
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            }
+        });
+    }
+</script>
+<script src="https://sdk.scdn.co/spotify-player.js"></script>

@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
+using Melodix.Models;
 using Melodix.Models.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -22,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace Melodix.MVC.Areas.Identity.Pages.Account
 {
-    public class RegisterModel : PageModel
+    public class RegisterModel:PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -46,54 +47,26 @@ namespace Melodix.MVC.Areas.Identity.Pages.Account
             _emailSender = emailSender;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string ReturnUrl { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
             public string Password { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
@@ -101,8 +74,17 @@ namespace Melodix.MVC.Areas.Identity.Pages.Account
 
             [Required(ErrorMessage = "El campo Nick es obligatorio.")]
             public string Nick { get; set; }
-        }
 
+            [Required(ErrorMessage = "El campo Nombre es obligatorio.")]
+            public string Nombre { get; set; }
+
+            [Display(Name = "Fecha de nacimiento")]
+            [DataType(DataType.Date)]
+            public DateTime? FechaNacimiento { get; set; }
+
+            [Display(Name = "Género")]
+            public GeneroUsuario? Genero { get; set; }
+        }
 
         public async Task OnGetAsync(string returnUrl = null)
         {
@@ -123,6 +105,23 @@ namespace Melodix.MVC.Areas.Identity.Pages.Account
 
                 // Asigna propiedades personalizadas
                 user.Nick = Input.Nick;
+                user.Nombre = Input.Nombre;
+
+                // Asegura que la fecha de nacimiento sea UTC para Postgres
+                if(Input.FechaNacimiento.HasValue)
+                {
+                    var fecha = Input.FechaNacimiento.Value;
+                    if(fecha.Kind == DateTimeKind.Unspecified)
+                        user.FechaNacimiento = DateTime.SpecifyKind(fecha, DateTimeKind.Utc);
+                    else
+                        user.FechaNacimiento = fecha.ToUniversalTime();
+                }
+                else
+                {
+                    user.FechaNacimiento = null;
+                }
+
+                user.Genero = Input.Genero;
                 user.Activo = true;
                 user.CreadoEn = DateTime.UtcNow;
                 user.ActualizadoEn = DateTime.UtcNow;
@@ -210,4 +209,4 @@ namespace Melodix.MVC.Areas.Identity.Pages.Account
             return (IUserEmailStore<ApplicationUser>)_userStore;
         }
     }
-}
+    }

@@ -1,36 +1,39 @@
 ﻿using Melodix.Models;
-using Melodix.Models.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-        
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Melodix.Models.Models;
+
 namespace Melodix.Data
 {
-    public class ApplicationDbContext:IdentityDbContext<ApplicationUser, IdentityRole, string>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
 
-        public DbSet<PerfilUsuario> PerfilesUsuario { get; set; }
+        // DbSets principales (nombres en plural)
         public DbSet<Artista> Artistas { get; set; }
         public DbSet<Album> Albums { get; set; }
         public DbSet<Pista> Pistas { get; set; }
         public DbSet<ListaReproduccion> ListasReproduccion { get; set; }
-        public DbSet<ListaPista> ListaPistas { get; set; }
+        public DbSet<ListaPista> ListasPista { get; set; }
         public DbSet<HistorialEscucha> HistorialesEscucha { get; set; }
         public DbSet<HistorialLike> HistorialesLike { get; set; }
-        public DbSet<UsuarioLikeAlbum> UsuarioLikesAlbum { get; set; }
-        public DbSet<UsuarioLikeLista> UsuarioLikesLista { get; set; }
-        public DbSet<UsuarioLikePista> UsuarioLikesPista { get; set; }
+        public DbSet<UsuarioLikeAlbum> UsuariosLikeAlbum { get; set; }
+        public DbSet<UsuarioLikeLista> UsuariosLikeLista { get; set; }
+        public DbSet<UsuarioLikePista> UsuariosLikePista { get; set; }
         public DbSet<UsuarioSigue> UsuariosSigue { get; set; }
         public DbSet<UsuarioSigueArtista> UsuariosSigueArtista { get; set; }
         public DbSet<UsuarioSigueLista> UsuariosSigueLista { get; set; }
         public DbSet<PlanSuscripcion> PlanesSuscripcion { get; set; }
         public DbSet<Suscripcion> Suscripciones { get; set; }
         public DbSet<SuscripcionUsuario> SuscripcionesUsuario { get; set; }
-
         public DbSet<TransaccionPago> TransaccionesPago { get; set; }
         public DbSet<ArchivoSubido> ArchivosSubidos { get; set; }
         public DbSet<LogSistema> LogsSistema { get; set; }
@@ -40,13 +43,27 @@ namespace Melodix.Data
         {
             base.OnModelCreating(builder);
 
-            // Relación 1:1 entre usuario Identity y perfil extendido
-            builder.Entity<ApplicationUser>()
-                .HasOne(u => u.Perfil)
-                .WithOne(p => p.Usuario)
-                .HasForeignKey<PerfilUsuario>(p => p.UsuarioId);
+            // Elimina la configuración 1:1 de usuario y perfil extendido
+            // Ya NO necesitas esto:
+            // builder.Entity<ApplicationUser>()
+            //     .HasOne(u => u.Perfil)
+            //     .WithOne(p => p.Usuario)
+            //     .HasForeignKey<PerfilUsuario>(p => p.UsuarioId)
+            //     .IsRequired();
 
-            // Relaciones UsuarioSigue (seguidores y seguidos)
+            // Índices en campos de búsqueda frecuente
+            builder.Entity<ApplicationUser>()
+                .HasIndex(u => u.SpotifyId);
+            builder.Entity<Artista>()
+                .HasIndex(a => a.SpotifyArtistaId);
+            builder.Entity<Album>()
+                .HasIndex(a => a.SpotifyAlbumId);
+            builder.Entity<Pista>()
+                .HasIndex(p => p.SpotifyPistaId);
+            builder.Entity<ListaReproduccion>()
+                .HasIndex(l => l.SpotifyListaId);
+
+            // Unicidad en relaciones muchos-a-muchos de follows (UsuarioSigue)
             builder.Entity<UsuarioSigue>()
                 .HasKey(us => new { us.SeguidorId, us.SeguidoId });
 
@@ -62,17 +79,28 @@ namespace Melodix.Data
                 .HasForeignKey(us => us.SeguidoId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Relaciones para UsuarioSigueArtista
-            builder.Entity<UsuarioSigueArtista>()
-                .HasOne(usa => usa.Usuario)
-                .WithMany(u => u.UsuarioSigueArtistas)
-                .HasForeignKey(usa => usa.UsuarioId);
+            builder.Entity<UsuarioSigue>()
+                .HasIndex(us => new { us.SeguidorId, us.SeguidoId })
+                .IsUnique();
 
-            // Relaciones para UsuarioSigueLista
+            // Unicidad en UsuarioLikeAlbum, UsuarioLikeLista, UsuarioLikePista
+            builder.Entity<UsuarioLikeAlbum>()
+                .HasIndex(x => new { x.UsuarioId, x.AlbumId })
+                .IsUnique();
+            builder.Entity<UsuarioLikeLista>()
+                .HasIndex(x => new { x.UsuarioId, x.ListaId })
+                .IsUnique();
+            builder.Entity<UsuarioLikePista>()
+                .HasIndex(x => new { x.UsuarioId, x.PistaId })
+                .IsUnique();
+
+            // Relación muchos-a-muchos UsuarioSigueArtista
+            builder.Entity<UsuarioSigueArtista>()
+                .HasIndex(x => new { x.UsuarioId, x.ArtistaId })
+                .IsUnique();
             builder.Entity<UsuarioSigueLista>()
-                .HasOne(usl => usl.Usuario)
-                .WithMany(u => u.UsuarioSigueListas)
-                .HasForeignKey(usl => usl.UsuarioId);
+                .HasIndex(x => new { x.UsuarioId, x.ListaId })
+                .IsUnique();
 
             // Relaciones para UsuarioLikeAlbum
             builder.Entity<UsuarioLikeAlbum>()
@@ -91,6 +119,18 @@ namespace Melodix.Data
                 .HasOne(ulp => ulp.Usuario)
                 .WithMany(u => u.UsuarioLikePistas)
                 .HasForeignKey(ulp => ulp.UsuarioId);
+
+            // Relaciones para UsuarioSigueArtista
+            builder.Entity<UsuarioSigueArtista>()
+                .HasOne(usa => usa.Usuario)
+                .WithMany(u => u.UsuarioSigueArtistas)
+                .HasForeignKey(usa => usa.UsuarioId);
+
+            // Relaciones para UsuarioSigueLista
+            builder.Entity<UsuarioSigueLista>()
+                .HasOne(usl => usl.Usuario)
+                .WithMany(u => u.UsuarioSigueListas)
+                .HasForeignKey(usl => usl.UsuarioId);
 
             // Relaciones para HistorialEscucha
             builder.Entity<HistorialEscucha>()
@@ -151,45 +191,70 @@ namespace Melodix.Data
                 .HasForeignKey(s => s.AdminRevisorId)
                 .IsRequired(false);
 
+            // Ejemplo: Unicidad en SpotifyId de usuario (opcional pero recomendado para integridad)
+            builder.Entity<ApplicationUser>()
+                .HasIndex(u => u.SpotifyId)
+                .IsUnique(false); // Cambia a true si quieres forzar unicidad global
         }
 
-
+        // Auditoría automática de ApplicationUser (puedes expandirla a otras entidades si lo deseas)
         public override int SaveChanges()
         {
-            var entries = ChangeTracker.Entries()
-                .Where(e => e.Entity is ApplicationUser &&
-                            (e.State == EntityState.Added || e.State == EntityState.Modified));
-
-            foreach(var entry in entries)
-            {
-                var now = DateTime.UtcNow;
-                if(entry.State == EntityState.Added)
-                {
-                    ((ApplicationUser)entry.Entity).CreadoEn = now;
-                }
-                ((ApplicationUser)entry.Entity).ActualizadoEn = now;
-            }
-
+            SetAuditFields();
             return base.SaveChanges();
         }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
+            foreach(var entry in ChangeTracker.Entries()
+                        .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified))
+            {
+                foreach(var property in entry.Properties.Where(p => p.Metadata.ClrType == typeof(DateTime)))
+                {
+                    var dt = (DateTime)property.CurrentValue;
+                    if(dt.Kind == DateTimeKind.Unspecified)
+                    {
+                        property.CurrentValue = DateTime.SpecifyKind(dt, DateTimeKind.Utc);
+                    }
+                    else
+                    {
+                        property.CurrentValue = dt.ToUniversalTime();
+                    }
+                }
+                foreach(var property in entry.Properties.Where(p => p.Metadata.ClrType == typeof(DateTime?)))
+                {
+                    var dt = (DateTime?)property.CurrentValue;
+                    if(dt.HasValue)
+                    {
+                        if(dt.Value.Kind == DateTimeKind.Unspecified)
+                        {
+                            property.CurrentValue = DateTime.SpecifyKind(dt.Value, DateTimeKind.Utc);
+                        }
+                        else
+                        {
+                            property.CurrentValue = dt.Value.ToUniversalTime();
+                        }
+                    }
+                }
+            }
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+
+        private void SetAuditFields()
+        {
             var entries = ChangeTracker.Entries()
                 .Where(e => e.Entity is ApplicationUser &&
                             (e.State == EntityState.Added || e.State == EntityState.Modified));
 
-            foreach(var entry in entries)
+            foreach (var entry in entries)
             {
                 var now = DateTime.UtcNow;
-                if(entry.State == EntityState.Added)
+                if (entry.State == EntityState.Added)
                 {
                     ((ApplicationUser)entry.Entity).CreadoEn = now;
                 }
                 ((ApplicationUser)entry.Entity).ActualizadoEn = now;
             }
-
-            return await base.SaveChangesAsync(cancellationToken);
         }
     }
 }

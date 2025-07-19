@@ -1,23 +1,36 @@
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
 body {
-  background-color:dimgrey;
-  margin-bottom: 60px;
+  background: var(--background-primary) !important;
+  color: var(--text-primary) !important;
 }
+
+/* Ejemplo para botones */
+.btn-primary {
+  background-color: var(--button-primary-bg) !important;
+  color: var(--button-primary-fg) !important;
+  border-color: var(--accent) !important;
+}
+
+  .btn-primary:hover {
+    background-color: var(--accent) !important;
+    color: #222 !important;
+  }
+
+a {
+  color: var(--link-color) !important;
+}
+
+  a:hover {
+    color: var(--link-hover) !important;
+  }
+
+/* Inputs y selects */
+input, select, textarea {
+  background: var(--input-bg) !important;
+  color: var(--input-fg) !important;
+  border: 1px solid var(--input-border) !important;
+}
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--input-focus) !important;
+    outline: none !important;
+  }

@@ -1,0 +1,75 @@
+﻿:root {
+  /* =======================
+     AYU-DARK THEME VARIABLES
+     ======================= */
+  /* === Syntax === */
+  --syntax-tag: #39BAE6;
+  --syntax-function: #FFB454;
+  --syntax-entity: #59C2FF;
+  --syntax-string: #AAD94C;
+  --syntax-regexp: #95E6CB;
+  --syntax-markup: #F07178;
+  --syntax-keyword: #FF8F40;
+  --syntax-special: #E6B673;
+  --syntax-comment: #ACB6BF8C;
+  --syntax-constant: #D2A6FF;
+  --syntax-operator: #F29668;
+  /* === Version Control === */
+  --vcs-added: #7FD962;
+  --vcs-modified: #73B8FF;
+  --vcs-removed: #F26D78;
+  /* === Editor === */
+  --editor-foreground: #BFBDB6;
+  --editor-background: #0D1017;
+  --editor-line-highlight: #131721;
+  --editor-selection-active: #409FFF4D;
+  --editor-selection-inactive: #409FFF21;
+  --editor-find-match-active: #6C5980;
+  --editor-find-match-inactive: #6C598066;
+  --editor-gutter-active: #6C7380E6;
+  --editor-gutter-normal: #6C738099;
+  --editor-indent-guide-active: #6C738080;
+  --editor-indent-guide-normal: #6C738033;
+  /* === UI === */
+  --ui-foreground: #565B66;
+  --ui-background: #0B0E14;
+  --ui-border: #11151C;
+  --ui-line: #11151C;
+  --ui-selection-active: #47526640;
+  --ui-selection-normal: #47526633;
+  --ui-panel-background: #0F131A;
+  --ui-panel-shadow: #00000080;
+  /* === Common === */
+  --accent: #E6B450;
+  --error: #D95757;
+  /* === Web Development Usage === */
+  /* Text and backgrounds */
+  --text-primary: var(--editor-foreground);
+  --text-secondary: var(--ui-foreground);
+  --text-muted: #4A525C;
+  --background-primary: var(--editor-background);
+  --background-secondary: var(--ui-background);
+  --background-panel: var(--ui-panel-background);
+  --background-highlight: var(--editor-line-highlight);
+  /* Buttons */
+  --button-primary-bg: var(--accent);
+  --button-primary-fg: #131721;
+  --button-secondary-bg: var(--ui-foreground);
+  --button-secondary-fg: var(--editor-foreground);
+  /* Links */
+  --link-color: var(--syntax-tag);
+  --link-hover: var(--syntax-entity);
+  /* Status */
+  --color-success: var(--vcs-added);
+  --color-warning: var(--accent);
+  --color-error: var(--error);
+  --color-info: #73B8FF;
+  /* Form elements */
+  --input-bg: var(--ui-background);
+  --input-fg: var(--editor-foreground);
+  --input-border: var(--ui-border);
+  --input-focus: var(--accent);
+  /* Misc */
+  --shadow-panel: var(--ui-panel-shadow);
+  --border-radius: 4px;
+}

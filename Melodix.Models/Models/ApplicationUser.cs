@@ -1,29 +1,49 @@
-﻿    using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-//using Microsoft.Build.Framework;
 using System.ComponentModel.DataAnnotations;
 
 namespace Melodix.Models.Models
 {
-    // Usuario Identity + perfil extendido
-    // Usuario Identity + perfil extendido
-    public class ApplicationUser:IdentityUser
-    {
-        // Necesarios
 
-        [Required(ErrorMessage = "El campo Nick es obligatorio.")]
+    public class ApplicationUser : IdentityUser
+    {
+        [Required]
+        [MaxLength(100)]
+        public string Nombre { get; set; }
+
+        [Required]
+        [MaxLength(50)]
         public string Nick { get; set; }
+
+        [MaxLength(255)]
+        public string? FotoPerfil { get; set; }
+
+        [MaxLength(255)]
+        public string? Biografia { get; set; }
+
+        [MaxLength(100)]
+        public string? Ubicacion { get; set; }
+
+        public DateTime? FechaNacimiento { get; set; }
+
+        public GeneroUsuario? Genero { get; set; } // Enum
+
         public RolUsuario? Rol { get; set; }
-        public bool? Activo { get; set; }
+        public bool Activo { get; set; }
+        public bool Verificado { get; set; }
+
         public DateTime? CreadoEn { get; set; }
         public DateTime? ActualizadoEn { get; set; }
 
+        public string? SpotifyId { get; set; }
+        public string? SpotifyAccessToken { get; set; }
+        public string? SpotifyRefreshToken { get; set; }
+        public string? SpotifyAccountType { get; set; }
+
+        public string? Proveedor { get; set; }
+
         // Navegadores
-        public PerfilUsuario? Perfil { get; set; }
         public List<ListaReproduccion> ListasReproduccion { get; set; } = new();
         public List<HistorialEscucha> HistorialEscuchas { get; set; } = new();
         public List<UsuarioSigue> Seguidos { get; set; } = new();

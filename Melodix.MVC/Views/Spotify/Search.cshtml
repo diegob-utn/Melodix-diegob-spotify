@@ -1,0 +1,20 @@
+﻿@{
+    ViewBag.Title = "Buscar Canción";
+    // Obtén el parámetro de la query string usando Context.Request.Query (no Request.Query)
+    string query = Context.Request.Query["q"];
+}
+
+<form method="get" action="/Spotify/Search">
+    <input type="text" name="q" placeholder="Buscar canción..." value="@query" />
+    <button type="submit">Buscar</button>
+</form>
+
+@if(!string.IsNullOrEmpty(query))
+{
+    <pre id="result"></pre>
+    <script>
+        fetch('/Spotify/Search?q=@query')
+            .then(r => r.json())
+            .then(j => document.getElementById('result').textContent = JSON.stringify(j, null, 2));
+    </script>
+}

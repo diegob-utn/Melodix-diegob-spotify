@@ -1,22 +1,58 @@
+@using Microsoft.AspNetCore.Identity
+@using Melodix.Models.Models
+@inject UserManager<ApplicationUser> UserManager
+
 @{
-    ViewData["Title"] = "Inicio";
+    // Obtén el usuario actual y su token de Spotify desde Identity, NO Session
+    ApplicationUser currentUser = null;
+    string accessToken = null;
+    if(User.Identity.IsAuthenticated)
+    {
+        currentUser = await UserManager.GetUserAsync(User);
+        accessToken = currentUser?.SpotifyAccessToken;
+    }
 }
 
-<h2>Bienvenido a Melodix</h2>
+<h2>Bienvenido a Melodix-diegob-spotify</h2>
 
-<!-- Formulario de inicio de sesión de la app -->
-<partial name="~/Areas/Identity/Pages/Account/Login.cshtml" />
-
-<hr />
-
-<!-- Botón para autenticación con Spotify (solo visible si el usuario está autenticado) -->
-@if (User.Identity.IsAuthenticated)
+@if(!User.Identity.IsAuthenticated)
 {
-    <form asp-controller="Spotify" asp-action="Login" method="post">
-        <button type="submit" class="btn btn-success">Iniciar sesión con Spotify</button>
-    </form>
+    <div class="alert alert-warning">
+        Debes iniciar sesión en tu cuenta de Melodix para usar Spotify.
+    </div>
+}
+else if(string.IsNullOrEmpty(accessToken))
+{
+    <a href="@Url.Action("ConnectSpotify", "Profile")" class="btn btn-success">
+        Conectar cuenta Premium de Spotify
+    </a>
 }
 else
 {
-    <p>Inicia sesión en la app para conectar tu cuenta de Spotify.</p>
+    <span>¡Estás autenticado con Spotify!</span>
+
+    <!-- Aquí va el SDK y la inicialización -->
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+    <script>
+        window.onSpotifyWebPlaybackSDKReady = () => {
+            const token = '@accessToken';
+            const player = new Spotify.Player({
+                name: 'Melodix-diegob-spotify',
+                getOAuthToken: cb => { cb(token); },
+                volume: 0.5
+            });
+
+            player.addListener('ready', ({ device_id }) => {
+                console.log('Ready with Device ID', device_id);
+                window.spotifyDeviceId = device_id;
+            });
+
+            player.addListener('initialization_error', ({ message }) => { console.error(message); });
+            player.addListener('authentication_error', ({ message }) => { console.error(message); });
+            player.addListener('account_error', ({ message }) => { console.error(message); });
+            player.addListener('playback_error', ({ message }) => { console.error(message); });
+
+            player.connect();
+        };
+    </script>
 }

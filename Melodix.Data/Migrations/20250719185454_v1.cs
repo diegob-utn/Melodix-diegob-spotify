@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Melodix.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class v1init : Migration
+    public partial class v1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,9 +18,9 @@ namespace Melodix.Data.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Nombre = table.Column<string>(type: "text", nullable: false),
-                    SpotifyArtistaId = table.Column<string>(type: "text", nullable: false),
-                    UrlImagen = table.Column<string>(type: "text", nullable: false)
+                    Nombre = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
+                    SpotifyArtistaId = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    UrlImagen = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -46,10 +46,23 @@ namespace Melodix.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
-                    Rol = table.Column<int>(type: "integer", nullable: false),
+                    Nombre = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Nick = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    FotoPerfil = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Biografia = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Ubicacion = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    FechaNacimiento = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Genero = table.Column<int>(type: "integer", nullable: true),
+                    Rol = table.Column<int>(type: "integer", nullable: true),
                     Activo = table.Column<bool>(type: "boolean", nullable: false),
-                    CreadoEn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ActualizadoEn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Verificado = table.Column<bool>(type: "boolean", nullable: false),
+                    CreadoEn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ActualizadoEn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    SpotifyId = table.Column<string>(type: "text", nullable: true),
+                    SpotifyAccessToken = table.Column<string>(type: "text", nullable: true),
+                    SpotifyRefreshToken = table.Column<string>(type: "text", nullable: true),
+                    SpotifyAccountType = table.Column<string>(type: "text", nullable: true),
+                    Proveedor = table.Column<string>(type: "text", nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -110,7 +123,7 @@ namespace Melodix.Data.Migrations
                         column: x => x.ArtistaId,
                         principalTable: "Artistas",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -131,7 +144,7 @@ namespace Melodix.Data.Migrations
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -152,15 +165,15 @@ namespace Melodix.Data.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    ProviderKey = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    ProviderKey = table.Column<string>(type: "text", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
                     UserId = table.Column<string>(type: "text", nullable: false)
                 },
@@ -172,7 +185,7 @@ namespace Melodix.Data.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -190,13 +203,13 @@ namespace Melodix.Data.Migrations
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_AspNetUserRoles_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -204,8 +217,8 @@ namespace Melodix.Data.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(type: "text", nullable: false),
-                    LoginProvider = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    Name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
                     Value = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
@@ -216,7 +229,7 @@ namespace Melodix.Data.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -239,7 +252,7 @@ namespace Melodix.Data.Migrations
                         column: x => x.UsuarioId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -266,7 +279,7 @@ namespace Melodix.Data.Migrations
                         column: x => x.UsuarioId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -287,33 +300,6 @@ namespace Melodix.Data.Migrations
                     table.PrimaryKey("PK_LogsSistema", x => x.Id);
                     table.ForeignKey(
                         name: "FK_LogsSistema_AspNetUsers_UsuarioId",
-                        column: x => x.UsuarioId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PerfilesUsuario",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UsuarioId = table.Column<string>(type: "text", nullable: false),
-                    Nombre = table.Column<string>(type: "text", nullable: false),
-                    Proveedor = table.Column<string>(type: "text", nullable: true),
-                    Biografia = table.Column<string>(type: "text", nullable: true),
-                    FotoPerfil = table.Column<string>(type: "text", nullable: true),
-                    Ubicacion = table.Column<string>(type: "text", nullable: true),
-                    FechaNacimiento = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    SpotifyId = table.Column<string>(type: "text", nullable: true),
-                    SpotifyTokenAcceso = table.Column<string>(type: "text", nullable: true),
-                    SpotifyTokenRefresco = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PerfilesUsuario", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PerfilesUsuario_AspNetUsers_UsuarioId",
                         column: x => x.UsuarioId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -341,28 +327,28 @@ namespace Melodix.Data.Migrations
                         name: "FK_SolicitudesMusico_AspNetUsers_AdminRevisorId",
                         column: x => x.AdminRevisorId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_SolicitudesMusico_AspNetUsers_UsuarioId",
                         column: x => x.UsuarioId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "UsuariosSigue",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    CreadoEn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     SeguidorId = table.Column<string>(type: "text", nullable: false),
-                    SeguidoId = table.Column<string>(type: "text", nullable: false)
+                    SeguidoId = table.Column<string>(type: "text", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false),
+                    CreadoEn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UsuariosSigue", x => x.Id);
+                    table.PrimaryKey("PK_UsuariosSigue", x => new { x.SeguidorId, x.SeguidoId });
                     table.ForeignKey(
                         name: "FK_UsuariosSigue_AspNetUsers_SeguidoId",
                         column: x => x.SeguidoId,
@@ -395,13 +381,13 @@ namespace Melodix.Data.Migrations
                         column: x => x.ArtistaId,
                         principalTable: "Artistas",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UsuariosSigueArtista_AspNetUsers_UsuarioId",
                         column: x => x.UsuarioId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -424,13 +410,13 @@ namespace Melodix.Data.Migrations
                         column: x => x.UsuarioId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Suscripciones_PlanesSuscripcion_PlanId",
                         column: x => x.PlanId,
                         principalTable: "PlanesSuscripcion",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -439,17 +425,15 @@ namespace Melodix.Data.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Titulo = table.Column<string>(type: "text", nullable: false),
+                    Titulo = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     Duracion = table.Column<int>(type: "integer", nullable: false),
                     CreadoEn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ActualizadoEn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Artista = table.Column<string>(type: "text", nullable: false),
-                    Album = table.Column<string>(type: "text", nullable: false),
-                    UrlPortada = table.Column<string>(type: "text", nullable: false),
                     FechaLanzamiento = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    SpotifyPistaId = table.Column<string>(type: "text", nullable: false),
+                    UrlPortada = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    SpotifyPistaId = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     ArtistaId = table.Column<int>(type: "integer", nullable: false),
-                    AlbumId = table.Column<int>(type: "integer", nullable: true)
+                    AlbumId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -458,17 +442,18 @@ namespace Melodix.Data.Migrations
                         name: "FK_Pistas_Albums_AlbumId",
                         column: x => x.AlbumId,
                         principalTable: "Albums",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Pistas_Artistas_ArtistaId",
                         column: x => x.ArtistaId,
                         principalTable: "Artistas",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "UsuarioLikesAlbum",
+                name: "UsuariosLikeAlbum",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -479,23 +464,23 @@ namespace Melodix.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UsuarioLikesAlbum", x => x.Id);
+                    table.PrimaryKey("PK_UsuariosLikeAlbum", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UsuarioLikesAlbum_Albums_AlbumId",
+                        name: "FK_UsuariosLikeAlbum_Albums_AlbumId",
                         column: x => x.AlbumId,
                         principalTable: "Albums",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UsuarioLikesAlbum_AspNetUsers_UsuarioId",
+                        name: "FK_UsuariosLikeAlbum_AspNetUsers_UsuarioId",
                         column: x => x.UsuarioId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "UsuarioLikesLista",
+                name: "UsuariosLikeLista",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -506,19 +491,19 @@ namespace Melodix.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UsuarioLikesLista", x => x.Id);
+                    table.PrimaryKey("PK_UsuariosLikeLista", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UsuarioLikesLista_AspNetUsers_UsuarioId",
+                        name: "FK_UsuariosLikeLista_AspNetUsers_UsuarioId",
                         column: x => x.UsuarioId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UsuarioLikesLista_ListasReproduccion_ListaId",
+                        name: "FK_UsuariosLikeLista_ListasReproduccion_ListaId",
                         column: x => x.ListaId,
                         principalTable: "ListasReproduccion",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -539,13 +524,13 @@ namespace Melodix.Data.Migrations
                         column: x => x.UsuarioId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UsuariosSigueLista_ListasReproduccion_ListaId",
                         column: x => x.ListaId,
                         principalTable: "ListasReproduccion",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -565,13 +550,13 @@ namespace Melodix.Data.Migrations
                         column: x => x.UsuarioId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_SuscripcionesUsuario_Suscripciones_SuscripcionId",
                         column: x => x.SuscripcionId,
                         principalTable: "Suscripciones",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -598,12 +583,13 @@ namespace Melodix.Data.Migrations
                         column: x => x.UsuarioId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_TransaccionesPago_Suscripciones_SuscripcionId",
                         column: x => x.SuscripcionId,
                         principalTable: "Suscripciones",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -614,15 +600,15 @@ namespace Melodix.Data.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UsuarioId = table.Column<string>(type: "text", nullable: false),
                     Tipo = table.Column<int>(type: "integer", nullable: false),
-                    NombreArchivo = table.Column<string>(type: "text", nullable: false),
-                    RutaAlmacenamiento = table.Column<string>(type: "text", nullable: false),
+                    NombreArchivo = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    RutaAlmacenamiento = table.Column<string>(type: "character varying(1024)", maxLength: 1024, nullable: false),
                     TamanoBytes = table.Column<long>(type: "bigint", nullable: false),
                     FechaSubida = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     EsPublico = table.Column<bool>(type: "boolean", nullable: false),
-                    Extension = table.Column<string>(type: "text", nullable: true),
-                    HashArchivo = table.Column<string>(type: "text", nullable: true),
-                    Descripcion = table.Column<string>(type: "text", nullable: true),
-                    EntidadReferencia = table.Column<string>(type: "text", nullable: true),
+                    Extension = table.Column<string>(type: "character varying(12)", maxLength: 12, nullable: true),
+                    HashArchivo = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
+                    Descripcion = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: true),
+                    EntidadReferencia = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     IdReferencia = table.Column<int>(type: "integer", nullable: true),
                     PistaId = table.Column<int>(type: "integer", nullable: true)
                 },
@@ -634,12 +620,13 @@ namespace Melodix.Data.Migrations
                         column: x => x.UsuarioId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ArchivosSubidos_Pistas_PistaId",
                         column: x => x.PistaId,
                         principalTable: "Pistas",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -660,17 +647,17 @@ namespace Melodix.Data.Migrations
                         column: x => x.UsuarioId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_HistorialesEscucha_Pistas_PistaId",
                         column: x => x.PistaId,
                         principalTable: "Pistas",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ListaPistas",
+                name: "ListasPista",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -682,23 +669,23 @@ namespace Melodix.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ListaPistas", x => x.Id);
+                    table.PrimaryKey("PK_ListasPista", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ListaPistas_ListasReproduccion_ListaId",
+                        name: "FK_ListasPista_ListasReproduccion_ListaId",
                         column: x => x.ListaId,
                         principalTable: "ListasReproduccion",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ListaPistas_Pistas_PistaId",
+                        name: "FK_ListasPista_Pistas_PistaId",
                         column: x => x.PistaId,
                         principalTable: "Pistas",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "UsuarioLikesPista",
+                name: "UsuariosLikePista",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -709,25 +696,30 @@ namespace Melodix.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UsuarioLikesPista", x => x.Id);
+                    table.PrimaryKey("PK_UsuariosLikePista", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UsuarioLikesPista_AspNetUsers_UsuarioId",
+                        name: "FK_UsuariosLikePista_AspNetUsers_UsuarioId",
                         column: x => x.UsuarioId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UsuarioLikesPista_Pistas_PistaId",
+                        name: "FK_UsuariosLikePista_Pistas_PistaId",
                         column: x => x.PistaId,
                         principalTable: "Pistas",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Albums_ArtistaId",
                 table: "Albums",
                 column: "ArtistaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Albums_SpotifyAlbumId",
+                table: "Albums",
+                column: "SpotifyAlbumId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ArchivosSubidos_PistaId",
@@ -738,6 +730,11 @@ namespace Melodix.Data.Migrations
                 name: "IX_ArchivosSubidos_UsuarioId",
                 table: "ArchivosSubidos",
                 column: "UsuarioId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Artistas_SpotifyArtistaId",
+                table: "Artistas",
+                column: "SpotifyArtistaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -771,6 +768,11 @@ namespace Melodix.Data.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_SpotifyId",
+                table: "AspNetUsers",
+                column: "SpotifyId");
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
@@ -792,14 +794,19 @@ namespace Melodix.Data.Migrations
                 column: "UsuarioId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ListaPistas_ListaId",
-                table: "ListaPistas",
+                name: "IX_ListasPista_ListaId",
+                table: "ListasPista",
                 column: "ListaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ListaPistas_PistaId",
-                table: "ListaPistas",
+                name: "IX_ListasPista_PistaId",
+                table: "ListasPista",
                 column: "PistaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ListasReproduccion_SpotifyListaId",
+                table: "ListasReproduccion",
+                column: "SpotifyListaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ListasReproduccion_UsuarioId",
@@ -812,12 +819,6 @@ namespace Melodix.Data.Migrations
                 column: "UsuarioId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PerfilesUsuario_UsuarioId",
-                table: "PerfilesUsuario",
-                column: "UsuarioId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Pistas_AlbumId",
                 table: "Pistas",
                 column: "AlbumId");
@@ -826,6 +827,11 @@ namespace Melodix.Data.Migrations
                 name: "IX_Pistas_ArtistaId",
                 table: "Pistas",
                 column: "ArtistaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pistas_SpotifyPistaId",
+                table: "Pistas",
+                column: "SpotifyPistaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SolicitudesMusico_AdminRevisorId",
@@ -868,34 +874,37 @@ namespace Melodix.Data.Migrations
                 column: "UsuarioId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UsuarioLikesAlbum_AlbumId",
-                table: "UsuarioLikesAlbum",
+                name: "IX_UsuariosLikeAlbum_AlbumId",
+                table: "UsuariosLikeAlbum",
                 column: "AlbumId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UsuarioLikesAlbum_UsuarioId",
-                table: "UsuarioLikesAlbum",
-                column: "UsuarioId");
+                name: "IX_UsuariosLikeAlbum_UsuarioId_AlbumId",
+                table: "UsuariosLikeAlbum",
+                columns: new[] { "UsuarioId", "AlbumId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_UsuarioLikesLista_ListaId",
-                table: "UsuarioLikesLista",
+                name: "IX_UsuariosLikeLista_ListaId",
+                table: "UsuariosLikeLista",
                 column: "ListaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UsuarioLikesLista_UsuarioId",
-                table: "UsuarioLikesLista",
-                column: "UsuarioId");
+                name: "IX_UsuariosLikeLista_UsuarioId_ListaId",
+                table: "UsuariosLikeLista",
+                columns: new[] { "UsuarioId", "ListaId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_UsuarioLikesPista_PistaId",
-                table: "UsuarioLikesPista",
+                name: "IX_UsuariosLikePista_PistaId",
+                table: "UsuariosLikePista",
                 column: "PistaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UsuarioLikesPista_UsuarioId",
-                table: "UsuarioLikesPista",
-                column: "UsuarioId");
+                name: "IX_UsuariosLikePista_UsuarioId_PistaId",
+                table: "UsuariosLikePista",
+                columns: new[] { "UsuarioId", "PistaId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_UsuariosSigue_SeguidoId",
@@ -903,9 +912,10 @@ namespace Melodix.Data.Migrations
                 column: "SeguidoId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UsuariosSigue_SeguidorId",
+                name: "IX_UsuariosSigue_SeguidorId_SeguidoId",
                 table: "UsuariosSigue",
-                column: "SeguidorId");
+                columns: new[] { "SeguidorId", "SeguidoId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_UsuariosSigueArtista_ArtistaId",
@@ -913,9 +923,10 @@ namespace Melodix.Data.Migrations
                 column: "ArtistaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UsuariosSigueArtista_UsuarioId",
+                name: "IX_UsuariosSigueArtista_UsuarioId_ArtistaId",
                 table: "UsuariosSigueArtista",
-                column: "UsuarioId");
+                columns: new[] { "UsuarioId", "ArtistaId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_UsuariosSigueLista_ListaId",
@@ -923,9 +934,10 @@ namespace Melodix.Data.Migrations
                 column: "ListaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UsuariosSigueLista_UsuarioId",
+                name: "IX_UsuariosSigueLista_UsuarioId_ListaId",
                 table: "UsuariosSigueLista",
-                column: "UsuarioId");
+                columns: new[] { "UsuarioId", "ListaId" },
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -956,13 +968,10 @@ namespace Melodix.Data.Migrations
                 name: "HistorialesLike");
 
             migrationBuilder.DropTable(
-                name: "ListaPistas");
+                name: "ListasPista");
 
             migrationBuilder.DropTable(
                 name: "LogsSistema");
-
-            migrationBuilder.DropTable(
-                name: "PerfilesUsuario");
 
             migrationBuilder.DropTable(
                 name: "SolicitudesMusico");
@@ -974,13 +983,13 @@ namespace Melodix.Data.Migrations
                 name: "TransaccionesPago");
 
             migrationBuilder.DropTable(
-                name: "UsuarioLikesAlbum");
+                name: "UsuariosLikeAlbum");
 
             migrationBuilder.DropTable(
-                name: "UsuarioLikesLista");
+                name: "UsuariosLikeLista");
 
             migrationBuilder.DropTable(
-                name: "UsuarioLikesPista");
+                name: "UsuariosLikePista");
 
             migrationBuilder.DropTable(
                 name: "UsuariosSigue");

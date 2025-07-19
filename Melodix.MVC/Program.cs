@@ -1,12 +1,10 @@
 using Melodix.Data;
 using Melodix.Models.Models;
 using Melodix.MVC.Services.Patterns.Adapter.SendGrid;
-using Melodix.MVC.Services.SpotifyApis.Adapters;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using AspNet.Security.OAuth.Spotify;
 
 namespace Melodix.MVC
 {
@@ -40,13 +38,12 @@ namespace Melodix.MVC
             builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
             builder.Services.AddRazorPages();
-            //builder.Services.AddTransient<IEmailSender, SendGridEmailSender>();
+
             builder.Services.AddSingleton<IMailProvider, SendGridAdapter>();
             builder.Services.AddSingleton<IEmailSender, SendGridAdapter>();
-            builder.Services.AddHttpClient<ISpotifyWebApiAdapter, SpotifyWebApiAdapter>();
-            builder.Services.AddHttpClient<ISpotifyPlaybackSdkAdapter, SpotifyPlaybackSdkAdapter>();
-            builder.Services.AddHttpClient<ISpotifyAdsApiAdapter, SpotifyAdsApiAdapter>();
-            builder.Services.AddScoped<ISpotifyService, SpotifyService>();
+
+            builder.Services.AddTransient<IMailProvider, SendGridAdapter>();
+            builder.Services.AddTransient<IEmailSender, SendGridAdapter>();
 
 
             builder.Services.AddHttpsRedirection(options =>

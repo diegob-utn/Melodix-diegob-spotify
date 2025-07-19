@@ -52,6 +52,8 @@ namespace Melodix.Data.Migrations
 
                     b.HasIndex("ArtistaId");
 
+                    b.HasIndex("SpotifyAlbumId");
+
                     b.ToTable("Albums");
                 });
 
@@ -65,17 +67,22 @@ namespace Melodix.Data.Migrations
 
                     b.Property<string>("Nombre")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
 
                     b.Property<string>("SpotifyArtistaId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("UrlImagen")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SpotifyArtistaId");
 
                     b.ToTable("Artistas");
                 });
@@ -164,7 +171,7 @@ namespace Melodix.Data.Migrations
 
                     b.HasIndex("PistaId");
 
-                    b.ToTable("ListaPistas");
+                    b.ToTable("ListasPista");
                 });
 
             modelBuilder.Entity("Melodix.Models.ListaReproduccion", b =>
@@ -208,6 +215,8 @@ namespace Melodix.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("SpotifyListaId");
+
                     b.HasIndex("UsuarioId");
 
                     b.ToTable("ListasReproduccion");
@@ -221,11 +230,15 @@ namespace Melodix.Data.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
 
-                    b.Property<bool?>("Activo")
+                    b.Property<bool>("Activo")
                         .HasColumnType("boolean");
 
                     b.Property<DateTime?>("ActualizadoEn")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Biografia")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -241,6 +254,16 @@ namespace Melodix.Data.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<DateTime?>("FechaNacimiento")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FotoPerfil")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int?>("Genero")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
 
@@ -249,7 +272,13 @@ namespace Melodix.Data.Migrations
 
                     b.Property<string>("Nick")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -268,18 +297,40 @@ namespace Melodix.Data.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("Proveedor")
+                        .HasColumnType("text");
+
                     b.Property<int?>("Rol")
                         .HasColumnType("integer");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
+                    b.Property<string>("SpotifyAccessToken")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SpotifyAccountType")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SpotifyId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SpotifyRefreshToken")
+                        .HasColumnType("text");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("Ubicacion")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("Verificado")
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
@@ -289,6 +340,8 @@ namespace Melodix.Data.Migrations
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
+
+                    b.HasIndex("SpotifyId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -302,36 +355,42 @@ namespace Melodix.Data.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Descripcion")
-                        .HasColumnType("text");
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
 
                     b.Property<string>("EntidadReferencia")
-                        .HasColumnType("text");
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
 
                     b.Property<bool>("EsPublico")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Extension")
-                        .HasColumnType("text");
+                        .HasMaxLength(12)
+                        .HasColumnType("character varying(12)");
 
                     b.Property<DateTime>("FechaSubida")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("HashArchivo")
-                        .HasColumnType("text");
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
                     b.Property<int?>("IdReferencia")
                         .HasColumnType("integer");
 
                     b.Property<string>("NombreArchivo")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<int?>("PistaId")
                         .HasColumnType("integer");
 
                     b.Property<string>("RutaAlmacenamiento")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
 
                     b.Property<long>("TamanoBytes")
                         .HasColumnType("bigint");
@@ -384,54 +443,6 @@ namespace Melodix.Data.Migrations
                     b.HasIndex("UsuarioId");
 
                     b.ToTable("LogsSistema");
-                });
-
-            modelBuilder.Entity("Melodix.Models.Models.PerfilUsuario", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Biografia")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("FechaNacimiento")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("FotoPerfil")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Proveedor")
-                        .HasColumnType("text");
-
-                    b.Property<string>("SpotifyId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("SpotifyTokenAcceso")
-                        .HasColumnType("text");
-
-                    b.Property<string>("SpotifyTokenRefresco")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Ubicacion")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UsuarioId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UsuarioId")
-                        .IsUnique();
-
-                    b.ToTable("PerfilesUsuario");
                 });
 
             modelBuilder.Entity("Melodix.Models.Models.SolicitudMusico", b =>
@@ -529,16 +540,8 @@ namespace Melodix.Data.Migrations
                     b.Property<DateTime>("ActualizadoEn")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Album")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int?>("AlbumId")
+                    b.Property<int>("AlbumId")
                         .HasColumnType("integer");
-
-                    b.Property<string>("Artista")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<int>("ArtistaId")
                         .HasColumnType("integer");
@@ -554,21 +557,26 @@ namespace Melodix.Data.Migrations
 
                     b.Property<string>("SpotifyPistaId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Titulo")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("UrlPortada")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AlbumId");
 
                     b.HasIndex("ArtistaId");
+
+                    b.HasIndex("SpotifyPistaId");
 
                     b.ToTable("Pistas");
                 });
@@ -691,9 +699,10 @@ namespace Melodix.Data.Migrations
 
                     b.HasIndex("AlbumId");
 
-                    b.HasIndex("UsuarioId");
+                    b.HasIndex("UsuarioId", "AlbumId")
+                        .IsUnique();
 
-                    b.ToTable("UsuarioLikesAlbum");
+                    b.ToTable("UsuariosLikeAlbum");
                 });
 
             modelBuilder.Entity("Melodix.Models.UsuarioLikeLista", b =>
@@ -718,9 +727,10 @@ namespace Melodix.Data.Migrations
 
                     b.HasIndex("ListaId");
 
-                    b.HasIndex("UsuarioId");
+                    b.HasIndex("UsuarioId", "ListaId")
+                        .IsUnique();
 
-                    b.ToTable("UsuarioLikesLista");
+                    b.ToTable("UsuariosLikeLista");
                 });
 
             modelBuilder.Entity("Melodix.Models.UsuarioLikePista", b =>
@@ -745,9 +755,10 @@ namespace Melodix.Data.Migrations
 
                     b.HasIndex("PistaId");
 
-                    b.HasIndex("UsuarioId");
+                    b.HasIndex("UsuarioId", "PistaId")
+                        .IsUnique();
 
-                    b.ToTable("UsuarioLikesPista");
+                    b.ToTable("UsuariosLikePista");
                 });
 
             modelBuilder.Entity("Melodix.Models.UsuarioSigue", b =>
@@ -767,6 +778,9 @@ namespace Melodix.Data.Migrations
                     b.HasKey("SeguidorId", "SeguidoId");
 
                     b.HasIndex("SeguidoId");
+
+                    b.HasIndex("SeguidorId", "SeguidoId")
+                        .IsUnique();
 
                     b.ToTable("UsuariosSigue");
                 });
@@ -793,7 +807,8 @@ namespace Melodix.Data.Migrations
 
                     b.HasIndex("ArtistaId");
 
-                    b.HasIndex("UsuarioId");
+                    b.HasIndex("UsuarioId", "ArtistaId")
+                        .IsUnique();
 
                     b.ToTable("UsuariosSigueArtista");
                 });
@@ -820,7 +835,8 @@ namespace Melodix.Data.Migrations
 
                     b.HasIndex("ListaId");
 
-                    b.HasIndex("UsuarioId");
+                    b.HasIndex("UsuarioId", "ListaId")
+                        .IsUnique();
 
                     b.ToTable("UsuariosSigueLista");
                 });
@@ -904,12 +920,10 @@ namespace Melodix.Data.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("text");
@@ -946,12 +960,10 @@ namespace Melodix.Data.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Value")
                         .HasColumnType("text");
@@ -1056,17 +1068,6 @@ namespace Melodix.Data.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("Melodix.Models.Models.PerfilUsuario", b =>
-                {
-                    b.HasOne("Melodix.Models.Models.ApplicationUser", "Usuario")
-                        .WithOne("Perfil")
-                        .HasForeignKey("Melodix.Models.Models.PerfilUsuario", "UsuarioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Usuario");
-                });
-
             modelBuilder.Entity("Melodix.Models.Models.SolicitudMusico", b =>
                 {
                     b.HasOne("Melodix.Models.Models.ApplicationUser", "AdminRevisor")
@@ -1103,17 +1104,21 @@ namespace Melodix.Data.Migrations
 
             modelBuilder.Entity("Melodix.Models.Pista", b =>
                 {
-                    b.HasOne("Melodix.Models.Album", null)
+                    b.HasOne("Melodix.Models.Album", "Album")
                         .WithMany("Pistas")
-                        .HasForeignKey("AlbumId");
+                        .HasForeignKey("AlbumId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("Melodix.Models.Artista", "ArtistaNav")
+                    b.HasOne("Melodix.Models.Artista", "Artista")
                         .WithMany("Pistas")
                         .HasForeignKey("ArtistaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ArtistaNav");
+                    b.Navigation("Album");
+
+                    b.Navigation("Artista");
                 });
 
             modelBuilder.Entity("Melodix.Models.Suscripcion", b =>
@@ -1355,8 +1360,6 @@ namespace Melodix.Data.Migrations
                     b.Navigation("ListasReproduccion");
 
                     b.Navigation("LogsGenerados");
-
-                    b.Navigation("Perfil");
 
                     b.Navigation("Seguidores");
 
