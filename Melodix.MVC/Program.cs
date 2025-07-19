@@ -43,6 +43,10 @@ namespace Melodix.MVC
             builder.Services.AddTransient<IMailProvider, SendGridAdapter>();
             builder.Services.AddTransient<IEmailSender, SendGridAdapter>();
 
+
+            builder.Services.Configure<SpotifyOptions>(builder.Configuration.GetSection("Spotify"));
+            builder.Services.AddScoped<SpotifyService>();
+
             builder.Services.AddHttpsRedirection(options =>
             {
                 options.HttpsPort = 5001;

@@ -37,9 +37,12 @@ namespace Melodix.Models.Models
         public DateTime? ActualizadoEn { get; set; }
 
         public string? SpotifyId { get; set; }
+        public string? SpotifyAccountType { get; set; }
+
         public string? SpotifyAccessToken { get; set; }
         public string? SpotifyRefreshToken { get; set; }
-        public string? SpotifyAccountType { get; set; }
+        public DateTime? SpotifyTokenExpiration { get; set; }
+
 
         public string? Proveedor { get; set; }
 
