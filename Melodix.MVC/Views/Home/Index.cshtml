@@ -1,0 +1,22 @@
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+<h2>Bienvenido a Melodix</h2>
+
+<!-- Formulario de inicio de sesión de la app -->
+<partial name="~/Areas/Identity/Pages/Account/Login.cshtml" />
+
+<hr />
+
+<!-- Botón para autenticación con Spotify (solo visible si el usuario está autenticado) -->
+@if (User.Identity.IsAuthenticated)
+{
+    <form asp-controller="Spotify" asp-action="Login" method="post">
+        <button type="submit" class="btn btn-success">Iniciar sesión con Spotify</button>
+    </form>
+}
+else
+{
+    <p>Inicia sesión en la app para conectar tu cuenta de Spotify.</p>
+}
