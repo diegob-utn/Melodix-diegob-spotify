@@ -1,16 +1,58 @@
-﻿@model Melodix.Models.Models.ApplicationUser
+﻿@using Microsoft.AspNetCore.Identity
+@using Melodix.Models.Models
+@inject UserManager<ApplicationUser> UserManager
 
-<h2>Perfil de @Model.UserName</h2>
+@{
+    // Obtén el usuario actual y su token de Spotify desde Identity, NO Session
+    ApplicationUser currentUser = null;
+    string accessToken = null;
+    if(User.Identity.IsAuthenticated)
+    {
+        currentUser = await UserManager.GetUserAsync(User);
+        accessToken = currentUser?.SpotifyAccessToken;
+    }
+}
 
-@if(string.IsNullOrEmpty(Model.SpotifyAccessToken))
+<h2>Bienvenido a Melodix-diegob-spotify</h2>
+
+@if(!User.Identity.IsAuthenticated)
 {
-    <a href="@Url.Action("ConnectSpotify", "Profile")" class="btn btn-primary">Conectar cuenta Premium de Spotify</a>
+    <div class="alert alert-warning">
+        Debes iniciar sesión en tu cuenta de Melodix para usar Spotify.
+    </div>
+}
+else if(string.IsNullOrEmpty(accessToken))
+{
+    <a href="@Url.Action("ConnectSpotify", "Profile")" class="btn btn-success">
+        Conectar cuenta Premium de Spotify
+    </a>
 }
 else
 {
-    <div class="alert alert-success">
-        ¡Cuenta de Spotify conectada!
-    </div>
-    <p>Access Token: @Model.SpotifyAccessToken</p>
-    <!-- Aquí puedes poner botón para desconectar, llamar a APIs, etc. -->
+    <span>¡Estás autenticado con Spotify!</span>
+
+    <!-- Aquí va el SDK y la inicialización -->
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+    <script>
+        window.onSpotifyWebPlaybackSDKReady = () => {
+            const token = '@accessToken';
+            const player = new Spotify.Player({
+                name: 'Melodix-diegob-spotify',
+                getOAuthToken: cb => { cb(token); },
+                volume: 0.5
+            });
+
+            player.addListener('ready', ({ device_id }) => {
+                console.log('Ready with Device ID', device_id);
+                window.spotifyDeviceId = device_id;
+            });
+
+            player.addListener('initialization_error', ({ message }) => { console.error(message); });
+            player.addListener('authentication_error', ({ message }) => { console.error(message); });
+            player.addListener('account_error', ({ message }) => { console.error(message); });
+            player.addListener('playback_error', ({ message }) => { console.error(message); });
+
+            player.connect();
+        };
+    </script>
 }

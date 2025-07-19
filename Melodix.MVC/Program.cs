@@ -12,8 +12,9 @@ namespace Melodix.MVC
     {
         public static void Main(string[] args)
         {
-
             var builder = WebApplication.CreateBuilder(args);
+
+
 
             // Configura Kestrel para usar el certificado generado por mkcert
             builder.WebHost.ConfigureKestrel(options =>
@@ -36,15 +37,11 @@ namespace Melodix.MVC
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
             builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
-
             builder.Services.AddRazorPages();
 
-            builder.Services.AddSingleton<IMailProvider, SendGridAdapter>();
-            builder.Services.AddSingleton<IEmailSender, SendGridAdapter>();
-
+            // Usa solo AddTransient o AddSingleton, pero no ambos
             builder.Services.AddTransient<IMailProvider, SendGridAdapter>();
             builder.Services.AddTransient<IEmailSender, SendGridAdapter>();
-
 
             builder.Services.AddHttpsRedirection(options =>
             {
@@ -53,7 +50,6 @@ namespace Melodix.MVC
 
             builder.Services.Configure<IdentityOptions>(options =>
             {
-
                 options.Password.RequireDigit = true;
                 options.Password.RequireLowercase = true;
                 options.Password.RequireNonAlphanumeric = true;
@@ -65,41 +61,33 @@ namespace Melodix.MVC
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = "Spotify";
             })
-            .AddCookie()
-            .AddSpotify("Spotify", options =>
-            {
-                options.ClientId = Melodix.Keys.SpotifyKeys.ClientId;
-                options.ClientSecret = Melodix.Keys.SpotifyKeys.ClientSecret;
-                options.CallbackPath = "/callback";
-                options.Scope.Add("user-read-playback-state");
-                options.Scope.Add("user-modify-playback-state");
-                options.Scope.Add("user-read-currently-playing");
-                // Agrega más scopes si los necesitas
-            });
+            .AddCookie();
+
+            builder.Services.AddHttpClient();
 
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            if(app.Environment.IsDevelopment())
             {
                 app.UseMigrationsEndPoint();
             }
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
+
             app.UseStaticFiles();
 
             app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();
+
 
             app.MapControllerRoute(
                 name: "areas",

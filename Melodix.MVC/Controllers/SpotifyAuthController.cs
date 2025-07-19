@@ -4,21 +4,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using System.Web;
-
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
-using Melodix.Models.Models;
-using System.Threading.Tasks;
-using System.Net.Http;
-using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
-using System;
+using Melodix.Keys;
 
 namespace Melodix.MVC.Controllers
 {
-
     [Authorize]
     public class SpotifyAuthController:Controller
     {
@@ -31,25 +20,45 @@ namespace Melodix.MVC.Controllers
             _httpClientFactory = httpClientFactory;
         }
 
+        /// <summary>
+        /// Redirige al usuario a la autorización de Spotify.
+        /// Usa el ClientId y RedirectUri desde las keys.
+        /// </summary>
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult AuthorizeSpotify()
+        {
+            string clientId = SpotifyKeys.ClientId;
+            string redirectUri = SpotifyKeys.RedirectUri;
+            string scope = "user-read-email user-read-private streaming user-read-playback-state user-modify-playback-state";
+
+            string url =
+                $"https://accounts.spotify.com/authorize?response_type=code&client_id={clientId}&scope={Uri.EscapeDataString(scope)}&redirect_uri={Uri.EscapeDataString(redirectUri)}";
+            return Redirect(url);
+        }
+
+        /// <summary>
+        /// Callback de Spotify para recibir el authorization code y obtener el access token.
+        /// </summary>
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Callback(string code)
         {
             if(string.IsNullOrEmpty(code))
                 return RedirectToAction("Index", "Home");
 
-            // Configura tus credenciales
-            string clientId = Melodix.Keys.SpotifyKeys.ClientId;
-            string clientSecret = Melodix.Keys.SpotifyKeys.ClientSecret;
-            string redirectUri = "https://localhost:5001/SpotifyAuth/Callback";
+            string clientId = SpotifyKeys.ClientId;
+            string clientSecret = SpotifyKeys.ClientSecret;
+            string redirectUri = SpotifyKeys.RedirectUri;
 
             var postData = new List<KeyValuePair<string, string>>
-        {
-            new KeyValuePair<string, string>("grant_type", "authorization_code"),
-            new KeyValuePair<string, string>("code", code),
-            new KeyValuePair<string, string>("redirect_uri", redirectUri),
-            new KeyValuePair<string, string>("client_id", clientId),
-            new KeyValuePair<string, string>("client_secret", clientSecret)
-        };
+            {
+                new KeyValuePair<string, string>("grant_type", "authorization_code"),
+                new KeyValuePair<string, string>("code", code),
+                new KeyValuePair<string, string>("redirect_uri", redirectUri),
+                new KeyValuePair<string, string>("client_id", clientId),
+                new KeyValuePair<string, string>("client_secret", clientSecret)
+            };
 
             var client = _httpClientFactory.CreateClient();
             var request = new HttpRequestMessage(HttpMethod.Post, "https://accounts.spotify.com/api/token")
@@ -59,24 +68,30 @@ namespace Melodix.MVC.Controllers
 
             var response = await client.SendAsync(request);
             var content = await response.Content.ReadAsStringAsync();
-            var json = JObject.Parse(content);
+
+            JObject json;
+            try
+            {
+                json = JObject.Parse(content);
+            }
+            catch
+            {
+                // Manejo de error de parseo
+                return RedirectToAction("Index", "Home");
+            }
 
             var accessToken = json["access_token"]?.ToString();
             var refreshToken = json["refresh_token"]?.ToString();
-            var expiresIn = json["expires_in"]?.ToString();
 
-            // Guarda el access_token en el usuario autenticado
             var user = await _userManager.GetUserAsync(User);
 
-            if(user != null)
+            if(user != null && !string.IsNullOrEmpty(accessToken))
             {
                 user.SpotifyAccessToken = accessToken;
                 user.SpotifyRefreshToken = refreshToken;
-                // Si deseas, puedes guardar el tiempo de expiración en otro campo personalizado
                 await _userManager.UpdateAsync(user);
             }
 
-            // Redirige a la vista principal
             return RedirectToAction("Index", "Home");
         }
     }
